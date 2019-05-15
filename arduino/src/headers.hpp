@@ -1,0 +1,16 @@
+// TODO CHANGE
+
+#define PIN_SERVO_BASE 10
+#define PIN_SERVO_VERTICAL 11
+
+#define PIN_MOTOR 3
+
+#define PIN_BTN_DELAY 5
+
+#define LIMIT_BASE_MIN 10
+#define LIMIT_BASE_MAX 110
+#define LIMIT_VERT_MIN 30
+#define LIMIT_VERT_MAX 120
+
+#define DELAY_TIME 5
+

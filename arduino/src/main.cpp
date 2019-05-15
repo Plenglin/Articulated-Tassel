@@ -1,39 +1,31 @@
-#define LOGLEVEL_INFO
-
 #include <Arduino.h>
-#include <Servo.h>
 
-#define PIN_SERVO_BASE 10
-#define PIN_SERVO_VERTICAL 11
-#define PIN_MOTOR 3
+#include "headers.hpp"
+#include "servowrapper.hpp"
 
-#define PIN_BTN_DELAY 5
 
-#define DELAY_TIME 5
-
-/**
- * SG90 turning speed: 500 deg/s (.12s/60deg)
- */
-
-Servo base;
-Servo vertical;
+ServoWrapper base(PIN_SERVO_BASE, LIMIT_BASE_MIN, LIMIT_BASE_MAX, 0, 90);
+ServoWrapper vertical(PIN_SERVO_VERTICAL, LIMIT_VERT_MIN, LIMIT_VERT_MAX, 0, 90);
 
 void setup() {
-  base.attach(PIN_SERVO_BASE);
-  base.attach(PIN_SERVO_VERTICAL);
-
-  pinMode(PIN_BTN_DELAY, INPUT_PULLUP);
+    Serial.begin(115200);
+    pinMode(PIN_BTN_DELAY, INPUT_PULLUP);
 }
 
 volatile bool beginDelay = false;
 
 void loop() {
-  if (beginDelay) {
-    delay(DELAY_TIME);
-    
-  }
+    if (beginDelay) {
+        delay(DELAY_TIME);
+        beginDelay = false;
+    }
 }
 
 void onDelayBtnPush() {
-  beginDelay = true;
+    beginDelay = true;
+}
+
+void moveTasselDefault() {
+    base.set(0);
+    vertical.set(0);
 }
