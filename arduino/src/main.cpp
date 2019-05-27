@@ -2,21 +2,13 @@
 
 #include "headers.hpp"
 #include "servowrapper.hpp"
+#include "button.hpp"
 
 
 ServoWrapper base(PIN_SERVO_BASE, LIMIT_BASE_MIN, LIMIT_BASE_MAX, 0, 90);
 ServoWrapper vertical(PIN_SERVO_VERTICAL, LIMIT_VERT_MIN, LIMIT_VERT_MAX, 0, 90);
 
-volatile bool beginDelay = false;
-volatile bool beginHelicopter = false;
-
-void onDelayBtnPush() {
-    beginDelay = true;
-}
-
-void onHelicopterBtnPush() {
-    beginDelay = true;
-}
+Button btnDelay(PIN_MOVE_TASSEL_FWD);
 
 void resetServos() {
     Serial.println("Resetting servos");
@@ -48,28 +40,33 @@ void moveTasselToHelicopter() {
 
 void setup() {
     Serial.begin(115200);
-
-    pinMode(PIN_INPUT_0, INPUT_PULLUP);
-    pinMode(PIN_INPUT_1, INPUT_PULLUP);
-    pinMode(PIN_INPUT_2, INPUT_PULLUP);
+    btnDelay.setup();
+    pinMode(PIN_RAPIDLY_WIPE_TASSEL, INPUT_PULLUP);
     pinMode(13, OUTPUT);
 
     resetServos();
 }
 
 void loop() {
-    if (beginDelay) {
-        delay(DELAY_TIME);
+    int btnDelayOutput = btnDelay.update();
+    if (btnDelayOutput == RISING_EDGE || btnDelayOutput == FALLING_EDGE) {
+        Serial.println("Triggered the forward button");
+        delay(DELAY_MOVE_FWD);
         moveTasselToForward();
         delay(1000);
-        beginDelay = false;
+        base.setEnabled(false);
+        vertical.setEnabled(false);
     }
 
-    if (beginHelicopter) {
-        moveTasselToHelicopter();
-        delay(250);
-        //analogWrite(PIN_MOTOR, 255);
-        beginHelicopter = false;
+    if (digitalRead(PIN_RAPIDLY_WIPE_TASSEL)) {
+        base.setEnabled(true);
+        bool state = false;
+        while (digitalRead(PIN_RAPIDLY_WIPE_TASSEL)) {
+            base.set(state ? 0 : 90);
+            delay(DELAY_WIPE_TASSEL);
+            state = !state;
+        }
+        base.setEnabled(false);
     }
 }
 

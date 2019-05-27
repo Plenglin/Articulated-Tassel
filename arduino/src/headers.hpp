@@ -4,8 +4,8 @@
 #define PIN_SERVO_VERTICAL 11
 #define PIN_HELICOPTER 5
 
-#define PIN_INPUT_0 12
-#define PIN_INPUT_1 10
+#define PIN_MOVE_TASSEL_FWD 12
+#define PIN_RAPIDLY_WIPE_TASSEL 10
 #define PIN_INPUT_2 8
 
 #define LIMIT_BASE_MIN 90
@@ -13,5 +13,5 @@
 #define LIMIT_VERT_MIN 150
 #define LIMIT_VERT_MAX 60
 
-#define DELAY_TIME 5
-
+#define DELAY_MOVE_FWD 5000
+#define DELAY_WIPE_TASSEL 250
