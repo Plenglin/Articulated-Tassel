@@ -41,9 +41,7 @@ void moveTasselToHelicopter() {
     vertical.set(90);
 }
 
-void movePolar(float theta, float asc) {
-    float degTheta = degrees(theta);
-    float degAsc = degrees(asc);
+void movePolar(float degTheta, float degAsc) {
     Serial.print(degTheta);
     Serial.print(" ");
     Serial.println(degAsc);
@@ -52,23 +50,9 @@ void movePolar(float theta, float asc) {
     vertical.set(degAsc);
 }
 
-void moveAss(float psi, float zeta) {
-    // Convert from ass to cartesian
-    float cp = cos(psi);
-    float sp = sin(psi);
-    float cz = cos(zeta);
-    float sz = sin(zeta);
-
-    float inv2cp = INV_SQRT_2 * cp;
-    float inv2czsp = INV_SQRT_2 * cz * sp;
-
-    float x = inv2cp - inv2czsp;
-    float y = -sp * sz;
-    float z = -inv2cp - inv2czsp;
-
-    float theta = atan2(y, x) + PI / 4;
-    float asc = PI - acos(z);
-
+void moveTransformed(float r, float a) {
+    float theta = r * cos(a) + 60;
+    float asc = r * sin(a) + 30;
     movePolar(theta, asc);
 }
 
@@ -76,6 +60,7 @@ void setup() {
     Serial.begin(115200);
     btnDelay.setup();
     pinMode(PIN_RAPIDLY_WIPE_TASSEL, INPUT_PULLUP);
+    pinMode(PIN_REVERSE_TASSEL_SPIN, INPUT_PULLUP);
     pinMode(13, OUTPUT);
 
     resetServos();
@@ -93,15 +78,17 @@ void loop() {
     }
 
     if (digitalRead(PIN_RAPIDLY_WIPE_TASSEL)) {
+        Serial.println("Rapidly wiping tassel");
         base.setEnabled(true);
         vertical.setEnabled(true);
 
-        movePolar(PI / 2, 0);
+        float r = 30;
+        float a = 0.5;
+        float omega = 10;
+
+        moveTransformed(r, a);
         delay(1000);
 
-        float zeta = 0;
-        float phi = 1.3;
-        float omega = 10;
         unsigned long prevTime = millis();
 
         while (digitalRead(PIN_RAPIDLY_WIPE_TASSEL)) {
@@ -109,10 +96,12 @@ void loop() {
             float dt = (currTime - prevTime) / 1000.0;
             prevTime = currTime;
 
-            omega = min(omega + 5 * dt, 20);
-            phi = max(phi - 0.05 * dt, 0.5);
-            zeta = (zeta + omega * dt);
-            moveAss(phi, zeta);
+            r = max(r - 0.05 * dt, 10);
+            omega = min(omega + 5 * dt, 30);
+            float da = (digitalRead(PIN_REVERSE_TASSEL_SPIN) ? omega : -omega) * dt;
+
+            a = a + da;
+            moveTransformed(r, a);
         }
 
         base.setEnabled(false);
