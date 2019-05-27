@@ -41,9 +41,35 @@ void moveTasselToHelicopter() {
     vertical.set(90);
 }
 
-void movePolar(float r, float theta) {
-    base.set((sin(theta) + 1) * r);
-    vertical.set((cos(theta) + 1) * r);
+void movePolar(float theta, float asc) {
+    float degTheta = degrees(theta);
+    float degAsc = degrees(asc);
+    Serial.print(degTheta);
+    Serial.print(" ");
+    Serial.println(degAsc);
+
+    base.set(degTheta);
+    vertical.set(degAsc);
+}
+
+void moveAss(float psi, float zeta) {
+    // Convert from ass to cartesian
+    float cp = cos(psi);
+    float sp = sin(psi);
+    float cz = cos(zeta);
+    float sz = sin(zeta);
+
+    float inv2cp = INV_SQRT_2 * cp;
+    float inv2czsp = INV_SQRT_2 * cz * sp;
+
+    float x = inv2cp - inv2czsp;
+    float y = -sp * sz;
+    float z = -inv2cp - inv2czsp;
+
+    float theta = atan2(y, x) + PI / 4;
+    float asc = PI - acos(z);
+
+    movePolar(theta, asc);
 }
 
 void setup() {
@@ -70,20 +96,23 @@ void loop() {
         base.setEnabled(true);
         vertical.setEnabled(true);
 
-        movePolar(1, 3.14);
+        movePolar(PI / 2, 0);
         delay(1000);
 
-        float theta = 3.14;
-        float velocity = 20;
+        float zeta = 0;
+        float phi = 1.3;
+        float omega = 10;
         unsigned long prevTime = millis();
+
         while (digitalRead(PIN_RAPIDLY_WIPE_TASSEL)) {
             unsigned long currTime = millis();
             float dt = (currTime - prevTime) / 1000.0;
             prevTime = currTime;
 
-            //velocity = min(velocity + 10 * dt, 20.00);
-            theta = (theta + dt * velocity);
-            movePolar(theta);
+            omega = min(omega + 5 * dt, 20);
+            phi = max(phi - 0.05 * dt, 0.5);
+            zeta = (zeta + omega * dt);
+            moveAss(phi, zeta);
         }
 
         base.setEnabled(false);
