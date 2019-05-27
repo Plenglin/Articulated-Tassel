@@ -83,7 +83,7 @@ void loop() {
         vertical.setEnabled(true);
 
         float r = 30;
-        float a = 0.5;
+        float a = -PI / 3;
         float omega = 10;
 
         moveTransformed(r, a);
@@ -96,7 +96,7 @@ void loop() {
             float dt = (currTime - prevTime) / 1000.0;
             prevTime = currTime;
 
-            r = max(r - 0.05 * dt, 10);
+            r = max(r - 1 * dt, 20);
             omega = min(omega + 5 * dt, 30);
             float da = (digitalRead(PIN_REVERSE_TASSEL_SPIN) ? omega : -omega) * dt;
 
