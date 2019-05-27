@@ -5,6 +5,9 @@
 #include "button.hpp"
 
 
+const float SQRT_2 = sqrt(2);
+const float INV_SQRT_2 = 1 / SQRT_2;
+
 ServoWrapper base(PIN_SERVO_BASE, LIMIT_BASE_MIN, LIMIT_BASE_MAX, 0, 90);
 ServoWrapper vertical(PIN_SERVO_VERTICAL, LIMIT_VERT_MIN, LIMIT_VERT_MAX, 0, 90);
 
@@ -38,6 +41,11 @@ void moveTasselToHelicopter() {
     vertical.set(90);
 }
 
+void movePolar(float r, float theta) {
+    base.set((sin(theta) + 1) * r);
+    vertical.set((cos(theta) + 1) * r);
+}
+
 void setup() {
     Serial.begin(115200);
     btnDelay.setup();
@@ -60,13 +68,25 @@ void loop() {
 
     if (digitalRead(PIN_RAPIDLY_WIPE_TASSEL)) {
         base.setEnabled(true);
-        bool state = false;
+        vertical.setEnabled(true);
+
+        movePolar(1, 3.14);
+        delay(1000);
+
+        float theta = 3.14;
+        float velocity = 20;
+        unsigned long prevTime = millis();
         while (digitalRead(PIN_RAPIDLY_WIPE_TASSEL)) {
-            base.set(state ? 0 : 90);
-            delay(DELAY_WIPE_TASSEL);
-            state = !state;
+            unsigned long currTime = millis();
+            float dt = (currTime - prevTime) / 1000.0;
+            prevTime = currTime;
+
+            //velocity = min(velocity + 10 * dt, 20.00);
+            theta = (theta + dt * velocity);
+            movePolar(theta);
         }
+
         base.setEnabled(false);
+        vertical.setEnabled(false);
     }
 }
-
