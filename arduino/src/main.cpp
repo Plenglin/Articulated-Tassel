@@ -52,7 +52,7 @@ void movePolar(float degTheta, float degAsc) {
 
 void moveTransformed(float r, float a) {
     float theta = 1.3 * r * cos(a) + 45;
-    float asc = r * sin(a) + 30;
+    float asc = r * sin(a) + 45;
     movePolar(theta, asc);
 }
 
@@ -83,10 +83,10 @@ void loop() {
         vertical.setEnabled(true);
 
         float r = 30;
-        float a = -PI / 3;
+        float a = PI / 4;
         float omega = 15;
 
-        moveTransformed(r, a);
+        movePolar(0, 0);
         delay(1000);
 
         unsigned long prevTime = millis();
