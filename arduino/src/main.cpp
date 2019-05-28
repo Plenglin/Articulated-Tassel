@@ -51,7 +51,7 @@ void movePolar(float degTheta, float degAsc) {
 }
 
 void moveTransformed(float r, float a) {
-    float theta = r * cos(a) + 60;
+    float theta = 1.3 * r * cos(a) + 45;
     float asc = r * sin(a) + 30;
     movePolar(theta, asc);
 }
@@ -84,7 +84,7 @@ void loop() {
 
         float r = 30;
         float a = -PI / 3;
-        float omega = 10;
+        float omega = 15;
 
         moveTransformed(r, a);
         delay(1000);
@@ -96,9 +96,10 @@ void loop() {
             float dt = (currTime - prevTime) / 1000.0;
             prevTime = currTime;
 
-            r = max(r - 1 * dt, 20);
-            omega = min(omega + 5 * dt, 30);
+            //r = max(r - 1 * dt, 20);
+            //omega = min(omega + 5 * dt, 20);
             float da = (digitalRead(PIN_REVERSE_TASSEL_SPIN) ? omega : -omega) * dt;
+            Serial.println(omega);
 
             a = a + da;
             moveTransformed(r, a);
