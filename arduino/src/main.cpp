@@ -33,14 +33,6 @@ void moveTasselToForward() {
     vertical.set(0);
 }
 
-void moveTasselToHelicopter() {
-    base.setEnabled(true);
-    base.set(90);
-
-    vertical.setEnabled(true);    
-    vertical.set(90);
-}
-
 void movePolar(float degTheta, float degAsc) {
     Serial.print(degTheta);
     Serial.print(" ");
@@ -82,7 +74,7 @@ void loop() {
         base.setEnabled(true);
         vertical.setEnabled(true);
 
-        float r = 30;
+        float r = 40;
         float a = PI / 4;
         float omega = 15;
 
@@ -98,7 +90,7 @@ void loop() {
 
             //r = max(r - 1 * dt, 20);
             //omega = min(omega + 5 * dt, 20);
-            float da = (digitalRead(PIN_REVERSE_TASSEL_SPIN) ? omega : -omega) * dt;
+            float da = -omega * dt;
             Serial.println(omega);
 
             a = a + da;
