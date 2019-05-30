@@ -1,7 +1,6 @@
-#include <Arduino.h>
-
 #include "headers.hpp"
 #include "servowrapper.hpp"
+#include "spinstance.hpp"
 #include "button.hpp"
 
 
@@ -10,6 +9,7 @@ const float INV_SQRT_2 = 1 / SQRT_2;
 
 ServoWrapper base(PIN_SERVO_BASE, LIMIT_BASE_MIN, LIMIT_BASE_MAX, 0, 90);
 ServoWrapper vertical(PIN_SERVO_VERTICAL, LIMIT_VERT_MIN, LIMIT_VERT_MAX, 0, 90);
+Spinstance spinstance(&base, &vertical);
 
 Button btnDelay(PIN_MOVE_TASSEL_FWD);
 
@@ -31,21 +31,6 @@ void moveTasselToForward() {
 
     vertical.setEnabled(true);    
     vertical.set(0);
-}
-
-void movePolar(float degTheta, float degAsc) {
-    Serial.print(degTheta);
-    Serial.print(" ");
-    Serial.println(degAsc);
-
-    base.set(degTheta);
-    vertical.set(degAsc);
-}
-
-void moveTransformed(float r, float a) {
-    float theta = 1.3 * r * cos(a) + 45;
-    float asc = r * sin(a) + 45;
-    movePolar(theta, asc);
 }
 
 void setup() {
@@ -74,27 +59,12 @@ void loop() {
         base.setEnabled(true);
         vertical.setEnabled(true);
 
-        float r = 40;
-        float a = PI / 4;
-        float omega = 15;
-
-        movePolar(0, 0);
+        spinstance.move(40, -PI / 4);
         delay(1000);
 
-        unsigned long prevTime = millis();
-
+        spinstance.reset();
         while (digitalRead(PIN_RAPIDLY_WIPE_TASSEL)) {
-            unsigned long currTime = millis();
-            float dt = (currTime - prevTime) / 1000.0;
-            prevTime = currTime;
-
-            //r = max(r - 1 * dt, 20);
-            //omega = min(omega + 5 * dt, 20);
-            float da = -omega * dt;
-            Serial.println(omega);
-
-            a = a + da;
-            moveTransformed(r, a);
+            spinstance.update();
         }
 
         base.setEnabled(false);
