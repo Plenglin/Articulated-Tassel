@@ -59,13 +59,19 @@ void loop() {
         base.setEnabled(true);
         vertical.setEnabled(true);
 
-        spinstance.move(40, -PI / 4);
+        spinstance.setDirection(-1);
+        spinstance.move(40, 1.25 * PI);
         delay(1000);
 
         spinstance.reset();
         while (digitalRead(PIN_RAPIDLY_WIPE_TASSEL)) {
             spinstance.update();
         }
+        while (!spinstance.passedAngle(3 * PI / 2)) {
+            spinstance.update();
+        }
+        spinstance.movePolar(90, 0);
+        delay(200);
 
         base.setEnabled(false);
         vertical.setEnabled(false);

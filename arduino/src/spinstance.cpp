@@ -9,8 +9,6 @@ Spinstance::Spinstance(ServoWrapper *base, ServoWrapper *vert) : base(base), ver
 
 void Spinstance::reset() {
     prevTime = millis();
-    r = 40;
-    a = PI / 4;
     omega = 15;
 }
 
@@ -34,7 +32,7 @@ void Spinstance::update() {
 
     //r = max(r - 1 * dt, 20);
     //omega = min(omega + 5 * dt, 20);
-    float da = -omega * dt;
+    float da = direction * omega * dt;
     a0 = a;
     a += da;
     if (a < 0) {
@@ -59,4 +57,8 @@ bool Spinstance::passedAngle(float a) {
 
 float Spinstance::getA() {
     return a;
+}
+
+void Spinstance::setDirection(int direction) {
+    this->direction = direction;
 }
