@@ -11,7 +11,7 @@ ServoWrapper base(PIN_SERVO_BASE, LIMIT_BASE_MIN, LIMIT_BASE_MAX, 0, 90);
 ServoWrapper vertical(PIN_SERVO_VERTICAL, LIMIT_VERT_MIN, LIMIT_VERT_MAX, 0, 90);
 Spinstance spinstance(&base, &vertical);
 
-Button btnDelay(PIN_MOVE_TASSEL_FWD);
+Button btnDelay(PIN_RECEIVE_DIPLOMA);
 
 void resetServos() {
     Serial.println("Resetting servos");
@@ -46,10 +46,27 @@ void setup() {
 void loop() {
     int btnDelayOutput = btnDelay.update();
     if (btnDelayOutput == RISING_EDGE || btnDelayOutput == FALLING_EDGE) {
-        Serial.println("Triggered the forward button");
-        delay(DELAY_MOVE_FWD);
-        moveTasselToForward();
-        delay(1000);
+        Serial.println("Triggered the diploma button");
+        base.setEnabled(true);
+        vertical.setEnabled(true);
+
+        spinstance.setDirection(1);
+        spinstance.move(40, 1.25 * PI);
+        spinstance.movePolar(0, 0);
+        delay(2000);
+
+        spinstance.reset();
+        unsigned long start = millis();
+        Serial.println("Starting spin");
+        while (millis() - start < 5000) {
+            spinstance.update();
+        }
+        while (!spinstance.passedAngle(1.25 * PI)) {
+            spinstance.update();
+        }
+        spinstance.movePolar(0, 0);
+        delay(200);
+
         base.setEnabled(false);
         vertical.setEnabled(false);
     }
@@ -61,7 +78,7 @@ void loop() {
 
         spinstance.setDirection(-1);
         spinstance.move(40, 1.25 * PI);
-        delay(1000);
+        delay(500);
 
         spinstance.reset();
         while (digitalRead(PIN_RAPIDLY_WIPE_TASSEL)) {

@@ -46,13 +46,18 @@ void Spinstance::update() {
 bool Spinstance::passedAngle(float a) {
     float ap = this->a - a;
     float a0p = this->a0 - a;
+
     if (ap < 0) {
         ap += 2 * PI;
     }
     if (a0p < 0) {
         a0p += 2 * PI;
     }
-    return ap > PI && a0p < PI;
+    if (direction > 0) {
+        return a0p > PI && ap < PI;
+    } else {
+        return ap > PI && a0p < PI;
+    }
 }
 
 float Spinstance::getA() {
