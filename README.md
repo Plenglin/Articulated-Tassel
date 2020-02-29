@@ -18,7 +18,4 @@ The SCAAT does not constitute a process nor act. It was not created with the pur
 
 The SCAAT provides additional functionality to the existing cap, which is why it is more accurately classified as a functional augmentation. Any attempts to classify it otherwise would not be acknowledging its true nature.
 
----
-
-_Praise the SCAAT, for it delivereth us_ `extra functionality`. _We are bathed in the SCAAT's holy_ `gyration`. _We curse the heretics who decry its name and nature, misclassifying it as a_ `decoration`. _From now for eternity until the heat death of the universe, this Council hereby_ `stans` _the believers who call it a_ **`functional augmentation`**.
 
